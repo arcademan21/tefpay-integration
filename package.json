@@ -1,6 +1,6 @@
 {
   "name": "tefpay-integration",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Integración universal, robusta y minimalista de pagos y suscripciones TEFPAY para React, Express, Next.js, Fastify, Koa y NestJS. Centraliza la gestión, validación y notificaciones automáticas en un solo punto, con lógica profesional, cobertura de tests y documentación lista para presentación corporativa.",
   "author": "Haroldy Arturo Pérez Rodríguez <haroldyarturo@gmail.com>",
   "license": "Public",
