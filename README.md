@@ -1,78 +1,150 @@
-# tefpay-integration
+# `Tefpay Integration`
 
-Integración universal y segura de suscripciones y pagos TEFPAY para React y Node.js. Permite gestionar el ciclo completo de suscripciones, pagos y notificaciones automáticas.
+Integración universal, robusta y minimalista de pagos y suscripciones TEFPAY para React, Express, Fastify, Koa y NestJS.
+
+## Índice
+
+- [`Tefpay Integration`](#tefpay-integration)
+  - [Índice](#índice)
+  - [Características Destacadas](#características-destacadas)
+  - [Quick Start](#quick-start)
+    - [1. Instalación del paquete](#1-instalación-del-paquete)
+    - [2. Instalación de Peer Dependencies](#2-instalación-de-peer-dependencies)
+    - [3. Crear tu endpoint de notificaciones (Backend Obligatorio)](#3-crear-tu-endpoint-de-notificaciones-backend-obligatorio)
+    - [4. (Opcional) Integrar Hooks visuales en React](#4-opcional-integrar-hooks-visuales-en-react)
+    - [5. Ejecuta los tests para validar tu integración](#5-ejecuta-los-tests-para-validar-tu-integración)
+  - [Manejo de Notificaciones (Backend Obligatorio)](#manejo-de-notificaciones-backend-obligatorio)
+    - [Next.js (App Router)](#nextjs-app-router)
+    - [Express](#express)
+    - [Fastify](#fastify)
+    - [Koa](#koa)
+    - [NestJS](#nestjs)
+  - [Adaptadores Multiplataforma](#adaptadores-multiplataforma)
+  - [Hooks y Utilidades Frontend (React)](#hooks-y-utilidades-frontend-react)
+  - [Cobertura y Robustez de Tests](#cobertura-y-robustez-de-tests)
+  - [Preguntas Frecuentes (FAQ)](#preguntas-frecuentes-faq)
+    - [¿Por qué es obligatorio el uso de un backend para `handleTefpayNotification`?](#por-qué-es-obligatorio-el-uso-de-un-backend-para-handletefpaynotification)
+    - [¿Puedo usar el paquete solo en frontend?](#puedo-usar-el-paquete-solo-en-frontend)
+    - [¿Qué hago si la firma de la notificación es inválida?](#qué-hago-si-la-firma-de-la-notificación-es-inválida)
+    - [¿Cómo depuro errores de integración?](#cómo-depuro-errores-de-integración)
+    - [¿Por qué no hay un test de `Next.js` "estándar"?](#por-qué-no-hay-un-test-de-nextjs-estándar)
+  - [Solución de Problemas Comunes](#solución-de-problemas-comunes)
+  - [Diagrama de Flujo de Integración](#diagrama-de-flujo-de-integración)
+  - [Documentación Avanzada](#documentación-avanzada)
+  - [Soporte](#soporte)
 
 ---
 
-## Instalación
+## Características Destacadas
+
+- **Universal:** Compatibilidad con React, Express, Fastify, Koa y NestJS.
+- **Minimalista:** Fácil integración con mínima configuración.
+- **Robusta y Segura:** Validación automática de firmas, campos y tipos de transacción.
+- **Completa:** Manejo de pagos, suscripciones y sus notificaciones asociadas (altas, bajas, cobros, devoluciones, etc.).
+- **Herramientas para Frontend:** Hooks React para una experiencia de usuario fluida.
+- **Tests End-to-End:** Cobertura exhaustiva para una integración confiable.
+
+---
+
+## Quick Start
+
+### 1\. Instalación del paquete
 
 ```bash
 pnpm add tefpay-integration
+# o
+npm install tefpay-integration
+# o
+yarn add tefpay-integration
+```
+
+### 2\. Instalación de Peer Dependencies
+
+El paquete requiere que tengas instaladas las `peerDependencies` de tu framework. Instala las recomendadas según tu stack:
+
+- **React:** `pnpm add react` (para hooks frontend)
+- **Express:** `pnpm add express`
+- **Fastify:** `pnpm add fastify`
+- **Koa:** `pnpm add koa koa-bodyparser`
+- **NestJS:** `pnpm add @nestjs/common @nestjs/core`
+
+> **Compatibilidad:**
+>
+> - React `>= 18.x`
+> - Express `>= 4.x`
+> - Fastify `>= 4.x`
+> - Koa `>= 3.x`
+> - NestJS `>= 9.x`
+
+### 3\. Crear tu endpoint de notificaciones (Backend Obligatorio)
+
+Tefpay envía notificaciones automáticas a tu backend tras cada acción. El uso de `handleTefpayNotification` o sus adaptadores específicos es **obligatorio** para procesar correctamente el flujo de suscripciones y pagos. Consulta la sección detallada a continuación para ejemplos específicos.
+
+### 4\. (Opcional) Integrar Hooks visuales en React
+
+```tsx
+import { useTefpaySubscriptionAction, TefpayClient } from "tefpay-integration";
+// ...ver ejemplo completo en la sección "Hooks y Utilidades Frontend"
+```
+
+### 5\. Ejecuta los tests para validar tu integración
+
+```bash
+pnpm test -- --coverage
 ```
 
 ---
 
-## Flujo de integración y notificaciones
+## Manejo de Notificaciones (Backend Obligatorio)
 
-**IMPORTANTE:** Tefpay envía notificaciones automáticas a tu backend tras cada acción (alta, baja, cobro, devolución, etc.). Por eso, **el uso de `handleTefpayNotification` en tu proyecto principal es obligatorio** para procesar correctamente el flujo de suscripciones y pagos.
+El paquete ofrece adaptadores específicos para cada framework que simplifican la integración. Todos ellos utilizan internamente `handleTefpayNotification` para procesar el cuerpo de la solicitud, validar la firma y ejecutar tu `callback` personalizado.
 
-Debes exponer una ruta (por ejemplo, `/api/tefpay-notify`) que reciba las notificaciones y utilice este hook para validar, interpretar y actuar según el evento recibido.
-
-El hook:
-
-- Valida la firma y los datos recibidos.
-- Enriquecerá el objeto con campos como `event`, `status`, `reason`, `email`, etc.
-- Permite que tu backend decida la acción a tomar según el tipo de evento.
-
-**Sin este flujo, tu integración con Tefpay no funcionará correctamente, ya que las acciones (activación, suspensión, cobro, etc.) dependen de las notificaciones recibidas.**
-
-### ¿Puede el paquete procesar las notificaciones internamente?
-
-No, el paquete no puede procesar las notificaciones internamente tras cada transacción, porque:
-
-- Las notificaciones son enviadas por Tefpay directamente a tu backend (no al frontend ni al paquete).
-- El paquete no tiene acceso al endpoint público de tu servidor donde llegan las notificaciones.
-- Es responsabilidad del proyecto principal exponer la ruta y procesar la notificación usando el hook.
-
-**Por eso, debes importar y usar `handleTefpayNotification` en tu backend, en la ruta que recibirá las notificaciones de Tefpay.**
+> **ROBUSTEZ Y SEGURIDAD:**
+>
+> - **Validación automática:** El paquete valida el tamaño del body, la presencia de campos obligatorios, la firma y el tipo de transacción soportado en cada notificación.
+> - **Endpoint HTTPS:** Expón el endpoint de notificaciones solo por HTTPS.
+> - **No procesar:** Nunca proceses notificaciones si la firma es inválida o faltan datos críticos.
+> - **Restricción IP:** Limita el acceso al endpoint solo a IPs de Tefpay si es posible, o monitoriza intentos sospechosos.
+> - **Logging:** Registra todos los eventos y errores en logs persistentes para auditoría y trazabilidad.
+> - **Información sensible:** No devuelvas información sensible en la respuesta del endpoint.
+> - **Clave Secreta:** Revisa y actualiza la clave secreta periódicamente y almacénala solo en variables de entorno seguras (`process.env.TEFPAY_SECRET_KEY`).
+> - **Validar Eventos:** Valida siempre el `event` y los `data` recibidos antes de ejecutar cualquier acción en tu backend.
+> - **Middlewares de Seguridad:** Considera usar middlewares adicionales de validación (rate limiting, body size, CORS estricto) en el endpoint de notificaciones.
 
 ---
 
-## Ejemplo de integración de notificaciones
+### Next.js (App Router)
+
+Utiliza `tefpayNextHandler` en un Route Handler.
 
 ```typescript
-// pages/api/tefpay-notify.ts (Next.js)
-import { handleTefpayNotification } from "tefpay-integration";
+// app/api/tefpay-notify/route.ts
+import { tefpayNextHandler } from "tefpay-integration/dist/adapters/next-adapter";
+import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(req, res) {
+export async function POST(req: NextRequest) {
   try {
-    const result = await handleTefpayNotification(req.body, {
-      secretKey: process.env.TEFPAY_SECRET_KEY!,
-      callback: async (data) => {
-        // --- CASOS PRINCIPALES DE NOTIFICACIÓN TEFPAY ---
-        // La función handleTefpayNotification prepara el objeto 'data' con los siguientes campos:
-        // - event: tipo de evento detectado (ej: "subscription_activated", "charge_attempt_failed", "subscription_suspended", "refund_error", etc.)
-        // - status: estado del evento (ej: "active", "suspended", "failed", "error", etc.)
-        // - email, account, reason, trial, etc. según el caso
+    const result = await tefpayNextHandler(
+      req,
+      NextResponse, // Pasa NextResponse para la gestión de respuesta
+      process.env.TEFPAY_SECRET_KEY!,
+      async (data) => {
+        // --- Lógica de procesamiento de notificación ---
+        // 'data' contendrá los campos procesados (event, status, email, account, etc.)
 
-        // Suscripción activada por el banco
         if (
           data.event === "subscription_activated" &&
           data.status === "active"
         ) {
           // Actualiza la suscripción en BD, envía email, etc.
-          // data.trial === "ended"
           return { success: true, action: "activate_subscription", ...data };
         }
 
-        // Intento de cobro fallido
         if (data.event === "charge_attempt_failed") {
           // Registrar el fallo, enviar alerta, etc.
-          // data.reason contiene el motivo
           return { success: false, action: "charge_failed", ...data };
         }
 
-        // Suspensión de suscripción
         if (
           data.event === "subscription_suspended" &&
           data.status === "suspended"
@@ -81,307 +153,292 @@ export default async function handler(req, res) {
           return { success: true, action: "suspend_subscription", ...data };
         }
 
-        // Error en devolución
-        if (data.event === "refund_error") {
-          // Registrar el error
-          return { success: false, action: "refund_error", ...data };
-        }
-
-        // Activación por email
-        if (data.event === "subscription_activated" && data.email) {
-          // Activar suscripción por email
-          return {
-            success: true,
-            action: "activate_subscription_email",
-            ...data,
-          };
-        }
-
-        // Otros casos y acciones
-        // ...
-
-        // Si no se reconoce el evento
+        // Otros casos...
         return { success: false, action: "unknown", ...data };
-      },
-    });
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+      }
+    );
+    return NextResponse.json(result, { status: 200 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
   }
 }
 ```
 
----
+### Express
 
-## Ejemplo de integración en Express
+Utiliza `tefpayExpressMiddleware` como middleware de ruta. Asegúrate de tener `express.json()` o `body-parser` configurado.
 
-```javascript
-const express = require("express");
-const { handleTefpayNotification } = require("tefpay-integration");
+```typescript
+// app.ts (o archivo de ruta)
+import express from "express";
+import { tefpayExpressMiddleware } from "tefpay-integration/dist/adapters/express-adapter";
+
 const app = express();
-app.use(express.json());
+app.use(express.json()); // Necesario para parsear el body JSON
 
-app.post("/api/tefpay-notify", async (req, res) => {
-  try {
-    const result = await handleTefpayNotification(req.body, {
-      secretKey: process.env.TEFPAY_SECRET_KEY,
-      callback: async (data) => {
-        // Procesa la notificación en el backend
-        return { status: "ok", ...data };
-      },
-    });
-    res.json(result);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+app.post(
+  "/api/tefpay-notify",
+  tefpayExpressMiddleware(process.env.TEFPAY_SECRET_KEY!, async (data) => {
+    // Procesa la notificación en tu backend
+    return { status: "ok", ...data };
+  })
+);
+
+app.listen(3000, () => console.log("Express running on port 3000"));
 ```
 
----
+### Fastify
 
-## Ejemplo de integración en Fastify
+Utiliza `tefpayFastifyHandler` como handler de ruta. Fastify parsea el body JSON por defecto.
 
-```javascript
-const Fastify = require("fastify");
-const { handleTefpayNotification } = require("tefpay-integration");
+```typescript
+// app.ts (o archivo de ruta)
+import Fastify from "fastify";
+import { tefpayFastifyHandler } from "tefpay-integration/dist/adapters/fastify-adapter";
+
 const fastify = Fastify();
 
-fastify.post("/api/tefpay-notify", async (request, reply) => {
-  try {
-    const result = await handleTefpayNotification(request.body, {
-      secretKey: process.env.TEFPAY_SECRET_KEY,
-      callback: async (data) => {
-        // Procesa la notificación en el backend
+fastify.post(
+  "/api/tefpay-notify",
+  tefpayFastifyHandler(process.env.TEFPAY_SECRET_KEY!, async (data) => {
+    // Procesa la notificación en tu backend
+    return { status: "ok", ...data };
+  })
+);
+
+fastify.listen({ port: 3000 }, (err, address) => {
+  if (err) throw err;
+  console.log(`Fastify running on ${address}`);
+});
+```
+
+### Koa
+
+Utiliza `tefpayKoaMiddleware` como middleware de aplicación. Requiere `koa-bodyparser`.
+
+```typescript
+// app.ts (o archivo de ruta)
+import Koa from "koa";
+import bodyParser from "koa-bodyparser";
+import { tefpayKoaMiddleware } from "tefpay-integration/dist/adapters/koa-adapter";
+
+const app = new Koa();
+app.use(bodyParser()); // Necesario para parsear el body JSON
+
+app.use(
+  tefpayKoaMiddleware(process.env.TEFPAY_SECRET_KEY!, async (data) => {
+    // Procesa la notificación en tu backend
+    return { status: "ok", ...data };
+  })
+);
+
+app.listen(3000, () => console.log("Koa running on port 3000"));
+```
+
+### NestJS
+
+Utiliza `tefpayNestHandler` dentro de un controlador. Asegúrate de que NestJS esté configurado para usar Fastify o Express como motor subyacente (ambos son compatibles).
+
+```typescript
+// src/tefpay/tefpay.controller.ts
+import { Controller, Post, Req, Res } from "@nestjs/common";
+import { Request, Response } from "express"; // O FastifyRequest, FastifyReply si usas Fastify
+import { tefpayNestHandler } from "tefpay-integration/dist/adapters/nest-adapter";
+
+@Controller("tefpay")
+export class TefpayController {
+  @Post("notify") // Endpoint final: /tefpay/notify
+  async handleNotification(@Req() req: Request, @Res() res: Response) {
+    await tefpayNestHandler(
+      req,
+      res,
+      process.env.TEFPAY_SECRET_KEY!,
+      async (data) => {
+        // Procesa la notificación en tu backend
         return { status: "ok", ...data };
-      },
-    });
-    reply.send(result);
-  } catch (err) {
-    reply.status(400).send({ error: err.message });
+      }
+    );
   }
-});
+}
 ```
 
 ---
 
-## Adaptadores para integración rápida
+## Adaptadores Multiplataforma
 
-#### Express
+Los adaptadores son el puente entre tu framework y la lógica central de `tefpay-integration`.
 
-```typescript
-import { tefpayExpressMiddleware } from "tefpay-integration/dist/adapters/express-adapter";
+> Se encuentran en `dist/adapters` tras la compilación.
+> **Importa desde:** `tefpay-integration/dist/adapters/<nombre-adapter>`
 
-app.post(
-  "/api/tefpay-notify",
-  tefpayExpressMiddleware(process.env.TEFPAY_SECRET_KEY, async (data) => {
-    // Procesa la notificación
-    return { status: "ok", ...data };
-  })
-);
-```
+- `tefpay-integration/dist/adapters/next-adapter`
+- `tefpay-integration/dist/adapters/express-adapter`
+- `tefpay-integration/dist/adapters/fastify-adapter`
+- `tefpay-integration/dist/adapters/koa-adapter`
+- `tefpay-integration/dist/adapters/nest-adapter`
 
-#### Next.js API Route
+---
 
-```typescript
-import { tefpayNextHandler } from "tefpay-integration/dist/adapters/next-adapter";
+## Hooks y Utilidades Frontend (React)
 
-export default async function handler(req, res) {
-  await tefpayNextHandler(
-    req,
-    res,
-    process.env.TEFPAY_SECRET_KEY,
-    async (data) => {
-      // Procesa la notificación
-      return { status: "ok", ...data };
+Este paquete también incluye herramientas para simplificar la integración frontend en React.
+
+- **`useTefpaySubscriptionAction`**: Hook React para gestionar acciones relacionadas con suscripciones (ej. mostrar un formulario de pago, gestionar redirecciones).
+- **`TefpayPayment`**: Clase utilitaria para generar formularios de pago y manejar la interacción con la pasarela de Tefpay.
+
+**Ejemplo básico de `useTefpaySubscriptionAction`:**
+
+```tsx
+// components/SubscriptionButton.tsx
+import React from "react";
+import { useTefpaySubscriptionAction, TefpayClient } from "tefpay-integration";
+
+interface SubscriptionButtonProps {
+  userId: string;
+  planId: string;
+}
+
+const TefpayClientInstance = new TefpayClient({
+  merchantCode: process.env.NEXT_PUBLIC_TEFPAY_MERCHANT_CODE!,
+  terminal: process.env.NEXT_PUBLIC_TEFPAY_TERMINAL!,
+  apiUrl: process.env.NEXT_PUBLIC_TEFPAY_API_URL!,
+});
+
+const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
+  userId,
+  planId,
+}) => {
+  const { initiateAction, isLoading, error } =
+    useTefpaySubscriptionAction(TefpayClientInstance);
+
+  const handleSubscribe = async () => {
+    try {
+      // Aquí se simula la obtención de la URL de pago desde tu backend
+      // En una aplicación real, tu backend generaría esta URL de Tefpay
+      // basándose en userId, planId, y otros datos de la suscripción.
+      const response = await fetch("/api/create-tefpay-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, planId }),
+      });
+      const { paymentUrl } = await response.json();
+
+      if (paymentUrl) {
+        // Redirige al usuario al formulario de pago de Tefpay
+        initiateAction(paymentUrl);
+      } else {
+        throw new Error("No se pudo obtener la URL de pago de Tefpay.");
+      }
+    } catch (err) {
+      console.error("Error al iniciar suscripción:", err);
     }
+  };
+
+  return (
+    <div>
+      <button onClick={handleSubscribe} disabled={isLoading}>
+        {isLoading ? "Cargando..." : "Suscribirse Ahora"}
+      </button>
+      {error && <p style={{ color: "red" }}>Error: {error.message}</p>}
+    </div>
   );
-}
+};
+
+export default SubscriptionButton;
 ```
-
-#### Fastify
-
-```typescript
-import { tefpayFastifyHandler } from "tefpay-integration/dist/adapters/fastify-adapter";
-
-fastify.post(
-  "/api/tefpay-notify",
-  tefpayFastifyHandler(process.env.TEFPAY_SECRET_KEY, async (data) => {
-    // Procesa la notificación
-    return { status: "ok", ...data };
-  })
-);
-```
-
-#### Koa
-
-```typescript
-import { tefpayKoaMiddleware } from "tefpay-integration/dist/adapters/koa-adapter";
-
-app.use(
-  tefpayKoaMiddleware(process.env.TEFPAY_SECRET_KEY, async (data) => {
-    // Procesa la notificación
-    return { status: "ok", ...data };
-  })
-);
-```
-
-#### NestJS
-
-```typescript
-import { tefpayNestHandler } from "tefpay-integration/dist/adapters/nest-adapter";
-
-@Post("/api/tefpay-notify")
-async notify(@Req() req: Request, @Res() res: Response) {
-  await tefpayNestHandler(req, res, process.env.TEFPAY_SECRET_KEY, async (data) => {
-    // Procesa la notificación
-    return { status: "ok", ...data };
-  });
-}
-```
-
-### Importación de adaptadores tras la compilación
-
-> **Nota:** Los adaptadores ahora se encuentran en `dist/adapters` tras la compilación. Importa desde:
-> `tefpay-integration/dist/adapters/<nombre-adapter>`
-
-#### Express
-
-```typescript
-import { tefpayExpressMiddleware } from "tefpay-integration/dist/adapters/express-adapter";
-
-app.post(
-  "/api/tefpay-notify",
-  tefpayExpressMiddleware(process.env.TEFPAY_SECRET_KEY, async (data) => {
-    // Procesa la notificación
-    return { status: "ok", ...data };
-  })
-);
-```
-
-#### Next.js API Route
-
-```typescript
-  );
-}
-```
-
-import { tefpayNextHandler } from "tefpay-integration/dist/adapters/next-adapter";
-
-export default async function handler(req, res) {
-await tefpayNextHandler(
-req,
-res,
-process.env.TEFPAY_SECRET_KEY,
-async (data) => {
-// Procesa la notificación
-return { status: "ok", ...data };
-}
-);
-}
-
-````
-
-#### Fastify
-
-```typescript
-);
-````
-
-import { tefpayFastifyHandler } from "tefpay-integration/dist/adapters/fastify-adapter";
-
-fastify.post(
-"/api/tefpay-notify",
-tefpayFastifyHandler(process.env.TEFPAY_SECRET_KEY, async (data) => {
-// Procesa la notificación
-return { status: "ok", ...data };
-})
-);
-
-````
-
-#### Koa
-
-```typescript
-);
-````
-
-import { tefpayKoaMiddleware } from "tefpay-integration/dist/adapters/koa-adapter";
-
-app.use(
-tefpayKoaMiddleware(process.env.TEFPAY_SECRET_KEY, async (data) => {
-// Procesa la notificación
-return { status: "ok", ...data };
-})
-);
-
-````
-
-#### NestJS
-
-```typescript
-  });
-}
-````
-
-import { tefpayNestHandler } from "tefpay-integration/dist/adapters/nest-adapter";
-
-@Post("/api/tefpay-notify")
-async notify(@Req() req: Request, @Res() res: Response) {
-await tefpayNestHandler(req, res, process.env.TEFPAY_SECRET_KEY, async (data) => {
-// Procesa la notificación
-return { status: "ok", ...data };
-});
-}
-
-````
 
 ---
 
-## Otros hooks y utilidades
+## Cobertura y Robustez de Tests
 
-- `useTefpaySubscriptionAction`: Hook para gestionar acciones de suscripción desde React.
-- `TefpayPayment`: Clase para generar formularios y procesar pagos.
-- `TefpayUtils`: Utilidades para firma y validación.
+El paquete incluye **tests unitarios y de integración end-to-end (e2e)** para todos los adaptadores principales, asegurando la robustez y el correcto funcionamiento en diferentes entornos.
 
----
+- **Express:** `test/e2e/tefpay-e2e-express.test.ts`
+- **Fastify:** `test/e2e/tefpay-e2e-fastify.test.ts`
+- **Koa:** `test/e2e/tefpay-e2e-koa.test.ts`
+- **NestJS:** `test/e2e/tefpay-e2e-nest.test.ts`
+- **Next.js:** (`test/e2e/tefpay-e2e-next.test.ts`) - Requiere Next.js como `devDependency` y un entorno Next real para su ejecución.
 
-## Cobertura de tests
-
-Para mejorar la robustez del paquete, se recomienda:
-
-- Crear tests unitarios para cada hook y clase principal (ejemplo: `test/tefpay-notification.test.ts`).
-- Simular notificaciones reales y casos de error.
-- Probar la validación de firma y los distintos tipos de eventos.
-- Usar Jest para la ejecución y cobertura.
-
-**Ejemplo básico de test:**
-
-```typescript
-import { handleTefpayNotification } from "../src/tefpay-notification";
-
-describe("handleTefpayNotification", () => {
-  it("valida firma y procesa evento", async () => {
-    const body = {
-      Ds_Merchant_Amount: "1000",
-      Ds_Merchant_MerchantCode: "CODE",
-      Ds_Merchant_Order: "ORDER",
-      Ds_Merchant_TransactionType: "208",
-      Ds_Merchant_Signature: "firma-correcta",
-      Ds_Bank: "BANK",
-    };
-    const result = await handleTefpayNotification(body, {
-      secretKey: "SECRET",
-      validateSignature: false,
-      callback: async (data) => data,
-    });
-    expect(result.event).toBe("subscription_activated");
-    expect(result.status).toBe("active");
-  });
-});
-````
+Para cada framework, existe un test equivalente que valida el flujo completo, la robustez de la integración y el manejo de errores.
 
 ---
 
-## Soporte y dudas
+## Preguntas Frecuentes (FAQ)
 
-Si tienes dudas sobre la integración, notificaciones o el flujo de Tefpay, revisa la documentación oficial y contacta al equipo de soporte de Tefpay para activar las notificaciones en tu cuenta.
+### ¿Por qué es obligatorio el uso de un backend para `handleTefpayNotification`?
+
+Tefpay opera enviando notificaciones asíncronas a un endpoint de tu servidor. Procesar estas notificaciones es esencial para actualizar el estado de las suscripciones y pagos en tu base de datos y gestionar el ciclo de vida del usuario. Sin este procesamiento backend, tu integración no puede funcionar correctamente ni de forma segura.
+
+### ¿Puedo usar el paquete solo en frontend?
+
+No. Aunque se proporcionan hooks y utilidades para React, la parte crítica de la integración con Tefpay (validación de notificaciones y actualización de estados) **debe residir en tu backend** para garantizar seguridad y fiabilidad.
+
+### ¿Qué hago si la firma de la notificación es inválida?
+
+Si el paquete reporta una firma inválida, los pasos a seguir son:
+
+1.  **Verificar `TEFPAY_SECRET_KEY`:** Asegúrate de que la clave secreta configurada en tu `process.env.TEFPAY_SECRET_KEY` sea idéntica a la que tienes en tu panel de Tefpay. Un solo carácter diferente causará un fallo.
+2.  **Confirmar Body Parser:** Asegúrate de que tu framework (Express, Fastify, Koa, NestJS) esté parseando correctamente el cuerpo de la solicitud JSON antes de pasarla al adaptador de Tefpay.
+3.  **Depuración:** Activa los logs detallados para ver los datos exactos que está recibiendo tu endpoint y cómo se está calculando la firma.
+
+### ¿Cómo depuro errores de integración?
+
+1.  **Logs en tu Backend:** Implementa logging exhaustivo en tu `callback` y alrededor del manejador de notificaciones.
+2.  **Documentación Técnica:** Consulta la documentación técnica detallada de Tefpay sobre el formato de las notificaciones.
+3.  **Tests Incluidos:** Utiliza los tests `e2e` provistos en el paquete para simular notificaciones y verificar el comportamiento.
+4.  **Entorno de Desarrollo:** Realiza pruebas en un entorno de desarrollo donde puedas examinar las solicitudes entrantes y salientes.
+
+### ¿Por qué no hay un test de `Next.js` "estándar"?
+
+Los tests de Next.js requieren la ejecución dentro de un contexto de Next.js real o con `next` instalado como `devDependency`. Debido a la naturaleza del entorno de pruebas, no se incluye un test e2e de Next.js en la ejecución principal, pero se recomienda crearlos y ejecutarlos dentro de un proyecto Next.js.
+
+---
+
+## Solución de Problemas Comunes
+
+- **Error de firma inválida:** Clave secreta incorrecta o cuerpo de la solicitud modificado.
+  - **Solución:** Verifica tu `TEFPAY_SECRET_KEY` y asegúrate de que tu `body-parser` (o equivalente) esté configurado correctamente.
+- **No llegan notificaciones:** El endpoint no está expuesto correctamente o Tefpay no tiene la URL configurada.
+  - **Solución:** Confirma que tu servidor esté escuchando en la URL correcta y que esa URL esté registrada en tu panel de control de Tefpay. Verifica que no haya firewalls bloqueando las solicitudes de Tefpay.
+- **Error en adaptadores al importar:** Problemas con la ruta de importación o el proceso de transpilación.
+  - **Solución:** Asegúrate de importar desde `tefpay-integration/dist/adapters/<nombre-adapter>` después de que el paquete ha sido compilado.
+- **Problemas con `peerDependencies`:** El paquete no encuentra las dependencias necesarias de tu framework.
+  - **Solución:** Instala las versiones recomendadas de React, Express, Fastify, Koa y NestJS.
+- **Tests de Next.js no ejecutan:** No hay un entorno Next.js disponible.
+  - **Solución:** Ejecuta los tests de Next.js solo en proyectos Next.js reales donde `next` esté instalado.
+
+---
+
+## Diagrama de Flujo de Integración
+
+```mermaid
+flowchart TD
+  A[Frontend: React/Next.js (App)] -->|1. Iniciar Pago/Suscripción| B(Tu Backend: Express/Fastify/Koa/NestJS)
+  B -->|2. Generar Solicitud de Pago| C(Servidor TEFPAY)
+  C -->|3. Redirección al Formulario de Pago| A
+  A -->|4. Usuario Completa Pago| C
+  C -->|5. Notificación Automática (Webhook)| B
+  B -->|6. Adaptador TEFPAY (handleTefpayNotification)| D{Validación de Firma y Datos}
+  D -- "Firma OK" --> E[7. Callback Personalizado: Procesa Evento, Actualiza BD]
+  D -- "Firma Inválida" --> F[7. Error: Registra y Responde 400]
+  E -->|8. Respuesta HTTP 200| C
+  F -->|8. Respuesta HTTP 400| C
+  E -->|9. Notificar Frontend (Opcional: Websockets, Refetch)| A
+```
+
+---
+
+## Documentación Avanzada
+
+Para casos de uso complejos, configuraciones detalladas, variantes específicas y preguntas adicionales, consulta la documentación extendida:
+
+- [Documentación Técnica Avanzada](https://www.google.com/search?q=./docs/technical-documentation/README.md)
+- [Ejemplos de Uso Específicos](https://www.google.com/search?q=./docs/README.examples.md)
+
+---
+
+## Soporte
+
+Si tienes dudas sobre la configuración de tu cuenta Tefpay, el proceso de activación de notificaciones o el flujo transaccional específico de Tefpay, por favor, revisa su documentación oficial y contacta directamente al equipo de soporte de Tefpay.
+
+Para consultas relacionadas con la implementación de `tefpay-integration` en tu código, problemas con los adaptadores, o sugerencias de mejora del paquete, abre un _issue_ en nuestro repositorio de GitHub.

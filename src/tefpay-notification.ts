@@ -39,7 +39,25 @@ export async function handleTefpayNotification(
   body: TefpayNotificationData,
   options: TefpayNotificationOptions
 ): Promise<any> {
-  // Validar firma si se requiere
+  // Validaciones de robustez
+  // 1. Chequeo de tamaño de body
+  if (!body || typeof body !== "object" || Object.keys(body).length < 5) {
+    throw new Error("Body de notificación incompleto o inválido");
+  }
+  // 2. Chequeo de campos obligatorios
+  const requiredFields = [
+    "Ds_Merchant_Amount",
+    "Ds_Merchant_MerchantCode",
+    "Ds_Merchant_Order",
+    "Ds_Merchant_TransactionType",
+    "Ds_Merchant_Signature",
+  ];
+  for (const field of requiredFields) {
+    if (!body[field]) {
+      throw new Error(`Campo obligatorio faltante: ${field}`);
+    }
+  }
+  // 3. Validar firma si se requiere
   if (options.validateSignature !== false) {
     const expectedSignature = TefpayUtils.sha1(
       `${body.Ds_Merchant_Amount}${body.Ds_Merchant_MerchantCode}${body.Ds_Merchant_Order}${options.secretKey}`
@@ -48,7 +66,11 @@ export async function handleTefpayNotification(
       throw new Error("Firma de notificación inválida");
     }
   }
-
+  // 4. Validar tipo de evento soportado
+  const validTransactionTypes = ["208", "209", "210", "211"];
+  if (!validTransactionTypes.includes(body.Ds_Merchant_TransactionType)) {
+    throw new Error("Tipo de transacción no soportado");
+  }
   // Enriquecer el objeto con event y status
   let event = undefined;
   let status = undefined;

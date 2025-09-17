@@ -1,7 +1,7 @@
 {
   "name": "tefpay-integration",
   "version": "1.0.0",
-  "description": "Integración universal y segura de suscripciones TEFPAY para React. Centraliza y controla todas las acciones de suscripción desde un solo punto.",
+  "description": "Integración universal, robusta y minimalista de pagos y suscripciones TEFPAY para React, Express, Next.js, Fastify, Koa y NestJS. Centraliza la gestión, validación y notificaciones automáticas en un solo punto, con lógica profesional, cobertura de tests y documentación lista para presentación corporativa.",
   "author": "Haroldy Arturo Pérez Rodríguez <haroldyarturo@gmail.com>",
   "license": "Public",
   "repository": {
@@ -39,17 +39,26 @@
     "gateway"
   ],
   "peerDependencies": {
-    "react": ">=18.0.0",
     "express": ">=4.0.0",
-    "next": ">=13.0.0",
     "fastify": ">=4.0.0",
-    "koa": ">=2.0.0"
+    "koa": ">=2.0.0",
+    "next": ">=13.0.0",
+    "react": ">=18.0.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
+    "@types/koa": "^3.0.0",
+    "@types/koa-bodyparser": "^4.3.12",
     "@types/node": "^24.5.0",
     "@types/react": "^19.1.13",
+    "@types/supertest": "^6.0.3",
+    "express": "^5.1.0",
+    "fastify": "^5.6.0",
     "jest": "^30.1.3",
+    "koa": "^3.0.1",
+    "koa-bodyparser": "^4.4.1",
+    "supertest": "^7.1.4",
     "ts-jest": "^29.4.2",
     "tsup": "^8.5.0",
     "typescript": "^5.5.0"
