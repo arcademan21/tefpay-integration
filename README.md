@@ -488,3 +488,150 @@ El editor está disponible solo en modo desarrollo. Se activa mediante el botón
 
 - Consulta `docs/PROPUESTA_EDITOR_TEMPLATE.md` para la propuesta completa y detalles de arquitectura.
 - Ejemplos visuales y casos de uso en `docs/README.examples.md`.
+
+---
+
+## API: generateHostedPaymentForm
+
+Genera un formulario HTML listo para enviarse al gateway de Tefpay (página hospedada). El método monta por defecto una serie de campos ocultos `Ds_Merchant_*` con valores lógicos que pueden ser sobrescritos mediante el objeto `params` que se pasa al método.
+
+Campos incluidos por defecto (pueden ser sobrescritos mediante `params`):
+
+- `Ds_Merchant_Amount` — Importe en céntimos (p.ej. "1000").
+- `Ds_Merchant_Currency` — Código ISO numérico de moneda (por defecto `978` para EUR).
+- `Ds_Merchant_MerchantCode` — Código de comercio.
+- `Ds_Merchant_Order` — Identificador de la orden.
+- `Ds_Merchant_TransactionType` — Tipo de transacción (por defecto `201`).
+- `Ds_Merchant_Url` — URL de callback/notify.
+- `Ds_Merchant_UrlOK` — URL de retorno en caso de éxito.
+- `Ds_Merchant_UrlKO` — URL de retorno en caso de error.
+- `Ds_Merchant_Signature` — Firma generada automáticamente por la librería (puede sobrescribirse).
+- `Ds_Merchant_Terminal` — Terminal usado (por defecto `00000001`).
+- `Ds_Merchant_AdditionalData` — Campo adicional libre.
+- `Ds_Merchant_MatchingData` — Identificador de coincidencia (opcional).
+- `Ds_Merchant_TemplateNumber` — Número de plantilla (opcional).
+- `Ds_Merchant_MerchantCodeTemplate` — Código de plantilla del comercio (opcional).
+- `Ds_Merchant_MerchantData` — Datos adicionales del comercio (opcional).
+- `Ds_Merchant_Lang` — Idioma del formulario (por defecto `es`).
+- `Ds_Merchant_MerchantSignature` — Firma de merchant (por defecto igual a `Ds_Merchant_Signature`, pero puedes pasar `merchantSignature` en `params`).
+
+Ejemplo de uso:
+
+```ts
+import { TefpayClient, TefpayPayment } from "tefpay-integration";
+
+const client = new TefpayClient({
+  /* config */
+});
+const payment = new TefpayPayment(client);
+
+const html = payment.generateHostedPaymentForm({
+  amount: "1000",
+  merchantCode: "MYCODE",
+  order: "ORDER-123",
+  callbackUrl: "https://mi-backend/notify",
+  urlOK: "https://miweb/success",
+  urlKO: "https://miweb/fail",
+  secretKey: process.env.TEFPAY_SECRET_KEY!,
+  paymentGatewayUrl: "https://gateway.tefpay.example/hosted",
+  currency: "978", // opcional, por defecto 978 (EUR)
+  locale: "es", // opcional
+});
+
+// Renderiza en tu frontend o devuelvelo en un endpoint
+res.send(html);
+```
+
+Notas:
+
+- Para integraciones en producción se recomienda generar la firma y los campos sensibles en el servidor (backend). Este método facilita el HTML listo para enviar pero espera recibir la `secretKey` para firmar correctamente.
+- Si necesitas un HTML de preview sin campos Tefpay, usa las utilidades del editor; este método produce el formulario final listo para POST.
+
+## Fixtures de ejemplo (test/manual)
+
+En `test/manual/` incluimos ejemplos de salida HTML generados por las utilidades de pago (`subscription-output.html` y `hosted-output.html`). Estos fixtures tienen varias utilidades:
+
+- Sirven como ejemplos para integradores que quieran ver exactamente qué se envía al gateway.
+- Pueden usarse como fixtures para tests de regresión (comprobación automática de cambios en el formato).
+- Ayudan a debugging y a la generación de documentación y ejemplos.
+
+Si tus integraciones requieren comparar el HTML generado con un formato esperado, puedes usar estos archivos como referencia.
+
+## API: generateSubscriptionFormAndIframe
+
+Genera el HTML necesario para crear una suscripción en Tefpay y cargar el iframe correspondiente. El método monta por defecto una serie de campos ocultos `Ds_Merchant_*` orientados a la gestión de suscripciones y opciones de carga inicial (trial) que pueden ser sobrescritos mediante el objeto `options` que se pasa al método.
+
+Comportamiento adicional importante:
+
+- Si `matchingData` no se proporciona, la función generará automáticamente un identificador único basado en la fecha/hora (se normaliza y se rellena hasta 21 caracteres): esto garantiza idempotencia y trazabilidad.
+- La firma (`Ds_Merchant_MerchantSignature`) se calcula internamente usando SHA1 sobre: `trialAmount + merchantCode + matchingData + notifyUrl + merchantSharedkey`.
+- Se usa `buildHiddenFields` internamente para mezclar defaults y overrides; por tanto cualquier campo `Ds_Merchant_*` puede ser sobrescrito pasando la clave correspondiente en `options`.
+
+Campos incluidos por defecto (pueden ser sobrescritos mediante `options`):
+
+- `Ds_Merchant_TransactionType` — Tipo de transacción para suscripciones (por defecto `6`).
+- `Ds_Merchant_Subscription_ProcessingMethod` — Método de procesamiento (por defecto `201`).
+- `Ds_Merchant_Subscription_Action` — Acción de suscripción (por defecto `C`).
+- `Ds_Merchant_Currency` — Código ISO numérico de moneda (por defecto `978` para EUR).
+- `Ds_Merchant_Amount` — Importe de la prueba/primer cargo (p.ej. `trialAmount`).
+- `Ds_Merchant_Subscription_ChargeAmount` — Importe de la suscripción periódica.
+- `Ds_Merchant_Subscription_RelFirstCharge` — Relación de primer cargo (por defecto `02D`).
+- `Ds_Merchant_Subscription_PeriodType` — Tipo de periodo (por defecto `M` = mes).
+- `Ds_Merchant_Subscription_PeriodInterval` — Intervalo del periodo (por defecto `1`).
+- `Ds_Merchant_Terminal` — Terminal de pago según idioma (por defecto mapeado por locale, p.ej. `00000001` para `es`).
+- `Ds_Merchant_TerminalAuth` — Terminal de autenticación (por defecto igual a `Ds_Merchant_Terminal`).
+- `Ds_Merchant_Subscription_Iteration` — Número de iteraciones previstas (por defecto `0` para indefinido).
+- `Ds_Merchant_Url` — URL de notificación/callback (notifyUrl).
+- `Ds_Merchant_UrlOK` — URL de retorno en caso de éxito.
+- `Ds_Merchant_UrlKO` — URL de retorno en caso de error.
+- `Ds_Merchant_MerchantCode` — Código de comercio.
+- `Ds_Merchant_MerchantCodeTemplate` — Código de plantilla del comercio.
+- `Ds_Merchant_TemplateNumber` — Número de plantilla (por defecto `07`).
+- `Ds_Merchant_AdditionalData` — Campo adicional (por defecto `1`).
+- `Ds_Merchant_MatchingData` — Identificador de coincidencia (generado si no existe).
+- `Ds_Merchant_MerchantSignature` — Firma calculada con SHA1 (puedes sobrescribirla si necesitas una firma distinta generada externamente).
+- `Ds_Merchant_Subscription_Account` — Cuenta de suscripción (por defecto igual a `matchingData`).
+- `Ds_Merchant_Subscription_ClientName` — Nombre del cliente.
+- `Ds_Merchant_Subscription_ClientEmail` — Email del cliente (se limpia de acentos y espacios automáticamente).
+- `Ds_Merchant_Subscription_Description` — Descripción de la suscripción.
+- `Ds_Merchant_Description` — Descripción del pago inicial.
+- `Ds_Merchant_Subscription_NotifyCostumerByEmail` — Indica si notificar al cliente por correo (por defecto `0`).
+- `Ds_Merchant_Lang` — Idioma del formulario (por defecto el `locale` que pases).
+- `Ds_Merchant_Subscription_Enable` — Habilita la suscripción (por defecto `1`).
+
+Ejemplo de uso:
+
+```ts
+import { TefpayClient, TefpayPayment } from "tefpay-integration";
+
+const client = new TefpayClient({
+  /* config */
+});
+const payment = new TefpayPayment(client);
+
+const html = payment.generateSubscriptionFormAndIframe({
+  merchantCode: "MYCODE",
+  merchantSharedkey: process.env.TEFPAY_SECRET_KEY!,
+  merchantTemplate: "TEMPLATE-1",
+  paymentGatewayUrl: "https://gateway.tefpay.example/hosted",
+  iframeScriptUrl: "https://gateway.tefpay.example/iframe.js",
+  iframeConfigureUrl: "https://gateway.tefpay.example/configure",
+  trialAmount: "1000", // importe primer cargo en céntimos
+  subscriptionAmount: "5000", // importe recurrente
+  notifyUrl: "https://mi-backend/notify",
+  urlOK: "https://miweb/success",
+  urlKO: "https://miweb/fail",
+  hostname: "https://miweb",
+  locale: "es",
+  userName: "Juan Pérez",
+  userEmail: "juan@example.com",
+});
+
+// Devuelve HTML listo para renderizar; incluye el formulario con hidden inputs y el script que carga el iframe.
+res.send(html);
+```
+
+Notas:
+
+- Por seguridad, calcula la `merchantSharedkey` y la firma en tu servidor. `generateSubscriptionFormAndIframe` calcula internamente la firma si le proporcionas `merchantSharedkey`.
+- Si necesitas personalizar algún `Ds_Merchant_*` concreto, pásalo en `options` y sobrescribirá el valor por defecto gracias a `buildHiddenFields`.

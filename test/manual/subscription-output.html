@@ -1,0 +1,97 @@
+<form id="tefpayData" role="form" autocomplete="true">
+  <input type="hidden" name="Ds_Merchant_TransactionType" value="6" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_ProcessingMethod"
+    value="201"
+  />
+  <input type="hidden" name="Ds_Merchant_Subscription_Action" value="C" />
+  <input type="hidden" name="Ds_Merchant_Currency" value="978" />
+  <input type="hidden" name="Ds_Merchant_Amount" value="1000" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_ChargeAmount"
+    value="5000"
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_RelFirstCharge"
+    value="02D"
+  />
+  <input type="hidden" name="Ds_Merchant_Subscription_PeriodType" value="M" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_PeriodInterval"
+    value="1"
+  />
+  <input type="hidden" name="Ds_Merchant_Terminal" value="00000001" />
+  <input type="hidden" name="Ds_Merchant_TerminalAuth" value="00000001" />
+  <input type="hidden" name="Ds_Merchant_Subscription_Iteration" value="0" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Url"
+    value="https://my-backend/notify"
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_UrlOK"
+    value="https://my-site/success"
+  />
+  <input type="hidden" name="Ds_Merchant_UrlKO" value="https://my-site/fail" />
+  <input type="hidden" name="Ds_Merchant_MerchantCode" value="TEST123" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_MerchantCodeTemplate"
+    value="TEMPLATE-1"
+  />
+  <input type="hidden" name="Ds_Merchant_TemplateNumber" value="07" />
+  <input type="hidden" name="Ds_Merchant_AdditionalData" value="1" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_MatchingData"
+    value="MATCHING-TEST-00001"
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_MerchantSignature"
+    value="3fee5b811a0707cc5306e6ae32c1cd6a89fefa10"
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_Account"
+    value="MATCHING-TEST-00001"
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_ClientName"
+    value="Juan Pérez"
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_ClientEmail"
+    value="juan@example.com"
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_Description"
+    value="NUEVA SUSCRIPCION EN - /es "
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Description"
+    value="NUEVO PAGO EN - /es "
+  />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Subscription_NotifyCostumerByEmail"
+    value="0"
+  />
+  <input type="hidden" name="Ds_Merchant_Lang" value="es" />
+  <input type="hidden" name="Ds_Merchant_Subscription_Enable" value="1" />
+  <div id="tefpayBox"></div>
+</form>
+<script
+  src="https://gateway.tefpay.example/iframe.js"
+  async
+  onload="if(window.TefpayIframe && TefpayIframe.init()){TefpayIframe.configure('https://gateway.tefpay.example/configure', '100%');TefpayIframe.load();}"
+></script>

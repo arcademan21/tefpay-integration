@@ -6,5 +6,5 @@ export default defineConfig({
   format: ["esm", "cjs"],
   outDir: "dist",
   sourcemap: true,
-  external: ["browser-image-compression"],
+  external: ["browser-image-compression", "react", "react-dom"],
 });

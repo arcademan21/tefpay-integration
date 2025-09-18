@@ -114,58 +114,42 @@ export class TefpayPayment {
       `NUEVA SUSCRIPCION EN - /${options.locale} `;
     // Campos del formulario
     const cleanedEmail = TefpayPayment.cleanEmailString(options.userEmail);
-    const fields = [
-      { name: "Ds_Merchant_TransactionType", value: "6" },
-      { name: "Ds_Merchant_Subscription_ProcessingMethod", value: "201" },
-      { name: "Ds_Merchant_Subscription_Action", value: "C" },
-      { name: "Ds_Merchant_Currency", value: "978" },
-      { name: "Ds_Merchant_Amount", value: options.trialAmount },
-      {
-        name: "Ds_Merchant_Subscription_ChargeAmount",
-        value: options.subscriptionAmount,
-      },
-      { name: "Ds_Merchant_Subscription_RelFirstCharge", value: "02D" },
-      { name: "Ds_Merchant_Subscription_PeriodType", value: "M" },
-      { name: "Ds_Merchant_Subscription_PeriodInterval", value: "1" },
-      { name: "Ds_Merchant_Terminal", value: terminal },
-      { name: "Ds_Merchant_TerminalAuth", value: terminalAuth },
-      { name: "Ds_Merchant_Subscription_Iteration", value: "0" },
-      { name: "Ds_Merchant_Url", value: options.notifyUrl },
-      { name: "Ds_Merchant_UrlOK", value: options.urlOK },
-      { name: "Ds_Merchant_UrlKO", value: options.urlKO },
-      { name: "Ds_Merchant_MerchantCode", value: options.merchantCode },
-      {
-        name: "Ds_Merchant_MerchantCodeTemplate",
-        value: options.merchantTemplate,
-      },
-      {
-        name: "Ds_Merchant_TemplateNumber",
-        value: options.templateNumber || "07",
-      },
-      {
-        name: "Ds_Merchant_AdditionalData",
-        value: options.additionalData || "1",
-      },
-      { name: "Ds_Merchant_MatchingData", value: matchingData },
-      { name: "Ds_Merchant_MerchantSignature", value: signature },
-      {
-        name: "Ds_Merchant_Subscription_Account",
-        value: options.subscriptionAccount || matchingData,
-      },
-      { name: "Ds_Merchant_Subscription_ClientName", value: options.userName },
-      {
-        name: "Ds_Merchant_Subscription_ClientEmail",
-        value: cleanedEmail,
-      },
-      {
-        name: "Ds_Merchant_Subscription_Description",
-        value: subscriptionDescription,
-      },
-      { name: "Ds_Merchant_Description", value: paymentDescription },
-      { name: "Ds_Merchant_Subscription_NotifyCostumerByEmail", value: "0" },
-      { name: "Ds_Merchant_Lang", value: options.locale },
-      { name: "Ds_Merchant_Subscription_Enable", value: "1" },
-    ];
+    const defaultSubscriptionFields = {
+      Ds_Merchant_TransactionType: "6",
+      Ds_Merchant_Subscription_ProcessingMethod: "201",
+      Ds_Merchant_Subscription_Action: "C",
+      Ds_Merchant_Currency: "978",
+      Ds_Merchant_Amount: options.trialAmount,
+      Ds_Merchant_Subscription_ChargeAmount: options.subscriptionAmount,
+      Ds_Merchant_Subscription_RelFirstCharge: "02D",
+      Ds_Merchant_Subscription_PeriodType: "M",
+      Ds_Merchant_Subscription_PeriodInterval: "1",
+      Ds_Merchant_Terminal: terminal,
+      Ds_Merchant_TerminalAuth: terminalAuth,
+      Ds_Merchant_Subscription_Iteration: "0",
+      Ds_Merchant_Url: options.notifyUrl,
+      Ds_Merchant_UrlOK: options.urlOK,
+      Ds_Merchant_UrlKO: options.urlKO,
+      Ds_Merchant_MerchantCode: options.merchantCode,
+      Ds_Merchant_MerchantCodeTemplate: options.merchantTemplate,
+      Ds_Merchant_TemplateNumber: options.templateNumber || "07",
+      Ds_Merchant_AdditionalData: options.additionalData || "1",
+      Ds_Merchant_MatchingData: matchingData,
+      Ds_Merchant_MerchantSignature: signature,
+      Ds_Merchant_Subscription_Account:
+        options.subscriptionAccount || matchingData,
+      Ds_Merchant_Subscription_ClientName: options.userName,
+      Ds_Merchant_Subscription_ClientEmail: cleanedEmail,
+      Ds_Merchant_Subscription_Description: subscriptionDescription,
+      Ds_Merchant_Description: paymentDescription,
+      Ds_Merchant_Subscription_NotifyCostumerByEmail: "0",
+      Ds_Merchant_Lang: options.locale,
+      Ds_Merchant_Subscription_Enable: "1",
+    } as { [key: string]: string };
+    const fields = TefpayPayment.buildHiddenFields(
+      options,
+      defaultSubscriptionFields
+    );
     const inputs = fields
       .map((f) => `<input type='hidden' name='${f.name}' value='${f.value}' />`)
       .join("\n");
@@ -220,6 +204,26 @@ export class TefpayPayment {
     );
     cleaned = cleaned.replace(/\s+/g, "");
     return cleaned;
+  }
+
+  /**
+   * Construye el array de hidden fields a partir de defaults y overrides en params.
+   * Devuelve un array tipado de { name, value } listo para mapear a inputs.
+   */
+  private static buildHiddenFields(
+    params: { [key: string]: string | undefined },
+    defaults: { [key: string]: string }
+  ): Array<{ name: string; value: string }> {
+    const keys = Object.keys(defaults);
+    const result: Array<{ name: string; value: string }> = [];
+    for (const k of keys) {
+      const paramKey = k as string;
+      const override = (params && (params[paramKey] as string)) || undefined;
+      const value =
+        override !== undefined && override !== null ? override : defaults[k];
+      result.push({ name: paramKey, value: String(value) });
+    }
+    return result;
   }
 
   /**
@@ -350,20 +354,28 @@ export class TefpayPayment {
       params.callbackUrl,
       params.secretKey
     );
-    const fields = [
-      { name: "Ds_Merchant_Amount", value: params.amount },
-      { name: "Ds_Merchant_MerchantCode", value: params.merchantCode },
-      { name: "Ds_Merchant_Order", value: params.order },
-      { name: "Ds_Merchant_Url", value: params.callbackUrl },
-      { name: "Ds_Merchant_UrlOK", value: params.urlOK },
-      { name: "Ds_Merchant_UrlKO", value: params.urlKO },
-      { name: "Ds_Merchant_Signature", value: signature },
-      {
-        name: "Ds_Merchant_TransactionType",
-        value: params.transactionType || "201",
-      },
-      // Otros campos opcionales
-    ];
+    // Conjunto completo de campos hidden por defecto. Los valores pueden ser
+    // sobrescritos por propiedades en `params` si se proporcionan.
+    const defaultHostedFields = {
+      Ds_Merchant_Amount: params.amount,
+      Ds_Merchant_Currency: params.currency || "978",
+      Ds_Merchant_MerchantCode: params.merchantCode,
+      Ds_Merchant_Order: params.order,
+      Ds_Merchant_TransactionType: params.transactionType || "201",
+      Ds_Merchant_Url: params.callbackUrl || params.url || "",
+      Ds_Merchant_UrlOK: params.urlOK || "",
+      Ds_Merchant_UrlKO: params.urlKO || "",
+      Ds_Merchant_Signature: signature,
+      Ds_Merchant_Terminal: params.terminal || "00000001",
+      Ds_Merchant_AdditionalData: params.additionalData || "",
+      Ds_Merchant_MatchingData: params.matchingData || "",
+      Ds_Merchant_TemplateNumber: params.templateNumber || "",
+      Ds_Merchant_MerchantCodeTemplate: params.merchantTemplate || "",
+      Ds_Merchant_MerchantData: params.merchantData || "",
+      Ds_Merchant_Lang: params.locale || params.lang || "es",
+      Ds_Merchant_MerchantSignature: params.merchantSignature || signature,
+    } as { [key: string]: string };
+    const fields = TefpayPayment.buildHiddenFields(params, defaultHostedFields);
     const inputs = fields
       .map((f) => `<input type="hidden" name="${f.name}" value="${f.value}" />`)
       .join("\n");

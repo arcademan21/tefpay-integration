@@ -1,0 +1,43 @@
+<form
+  id="tefpay-payment-form"
+  action="https://gateway.tefpay.example/hosted"
+  method="POST"
+>
+  <input type="hidden" name="Ds_Merchant_Amount" value="1000" />
+  <input type="hidden" name="Ds_Merchant_Currency" value="978" />
+  <input type="hidden" name="Ds_Merchant_MerchantCode" value="TEST123" />
+  <input type="hidden" name="Ds_Merchant_Order" value="ORDER-123" />
+  <input type="hidden" name="Ds_Merchant_TransactionType" value="201" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Url"
+    value="https://mi-backend/notify"
+  />
+  <input type="hidden" name="Ds_Merchant_UrlOK" value="https://miweb/success" />
+  <input type="hidden" name="Ds_Merchant_UrlKO" value="https://miweb/fail" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_Signature"
+    value="d259bb66a0a95578f56916894a833a9c58f565a0"
+  />
+  <input type="hidden" name="Ds_Merchant_Terminal" value="00000001" />
+  <input type="hidden" name="Ds_Merchant_AdditionalData" value="" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_MatchingData"
+    value="MATCHING-TEST-HOSTED-0001"
+  />
+  <input type="hidden" name="Ds_Merchant_TemplateNumber" value="" />
+  <input type="hidden" name="Ds_Merchant_MerchantCodeTemplate" value="" />
+  <input type="hidden" name="Ds_Merchant_MerchantData" value="" />
+  <input type="hidden" name="Ds_Merchant_Lang" value="es" />
+  <input
+    type="hidden"
+    name="Ds_Merchant_MerchantSignature"
+    value="d259bb66a0a95578f56916894a833a9c58f565a0"
+  />
+  <noscript><input type="submit" value="Pagar" /></noscript>
+</form>
+<script>
+  document.getElementById("tefpay-payment-form").submit();
+</script>
