@@ -1,0 +1,419 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns="http://www.w3.org/1999/html"
+  lang="en"
+  xml:lang="en"
+>
+  <head>
+    <title>{COMMERCE_TITLE} | Pasarela de pago</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="{COMMERCE_TITLE} | Pasarela de pago" />
+    <meta name="author" content="{COMMERCE_TITLE}" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+    <!--favicon-->
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="img/00V0000000/favicon1.ico"
+    />
+
+    <!-- Bootstrap core CSS -->
+    <link
+      href="css/00V0000000/bootstrap/css/bootstrap.min.css"
+      type="text/css"
+      rel="stylesheet"
+    />
+
+    <!--font-awesome-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="css/00V0000000/font-awesome/css/all.css"
+    />
+
+    <!-- Custom Css -->
+    <link rel="stylesheet" type="text/css" href="css/00V0000000/main.css" />
+  </head>
+
+  <body
+    style=`margin: 0px; background-color: {BG_COLOR}; color: {TEXT_COLOR}; font-family: {FONT}`
+  >
+    <!-- Begin page content -->
+    <div id="wrapper" class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <!-- CAMPO NUMERO DE TARGETA -->
+          <div class="form-group has-feedback" id="PanBox">
+            <small class="my-1 mt-3 px-2 text-secondary"> {CARD_LABEL} </small>
+            <div class="input-icon">
+              <i class="fa fa-credit-card mr-1"></i>
+              <input
+                type="text"
+                class="form-control"
+                id="Ds_Merchant_PanMask"
+                autocomplete="off"
+                placeholder="{CARD_LABEL}"
+              />
+            </div>
+
+            <p class="help-block small hidden">&nbsp;&nbsp;{MSG48}</p>
+          </div>
+
+          <!-- CAMPOS DE FECHA Y CVV -->
+          <div class="form-group has-feedback">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="row" id="ExpiryBox">
+                  <div class="col-4 col-xs-4 col-md-4 col-lg-4">
+                    <small class="my-1 mt-3 px-2 text-secondary">
+                      {MSG46}
+                    </small>
+                    <div class="input-icon">
+                      <i class="fa fa-calendar"></i>
+                      <select
+                        class="form-control text-muted"
+                        id="Ds_Merchant_PanMonth"
+                        name="month_start"
+                      >
+                        <option selected disabled value="Mes">{MSG46}</option>
+                        <option>01</option>
+                        <option>02</option>
+                        <option>03</option>
+                        <option>04</option>
+                        <option>05</option>
+                        <option>06</option>
+                        <option>07</option>
+                        <option>08</option>
+                        <option>09</option>
+                        <option>10</option>
+                        <option>11</option>
+                        <option>12</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-4 col-xs-4 col-md-4 col-lg-4">
+                    <small class="my-1 mt-3 px-2 text-secondary">
+                      {MSG47}
+                    </small>
+                    <span class="divider_bar"></span>
+
+                    <div class="input-icon">
+                      <i class="fa fa-calendar"></i>
+                      <select
+                        class="form-control text-muted"
+                        id="Ds_Merchant_PanYear"
+                        name="year_start"
+                      ></select>
+                    </div>
+                  </div>
+
+                  <div class="col-4 col-xs-4 col-md-4 col-lg-4" id="CvvBox">
+                    <small class="my-1 mt-3 px-2 text-secondary">
+                      {MSG19}
+                    </small>
+                    <span class="divider_minus"></span>
+
+                    <div class="input-icon">
+                      <i class="fa fa-lock"></i>
+                      <input
+                        id="Ds_Cvv2"
+                        placeholder="{MSG19}"
+                        class="form-control"
+                        type="text"
+                        autocomplete="off"
+                        maxlength="4"
+                      />
+                    </div>
+
+                    <p class="help-block small hidden">&nbsp;&nbsp;{MSG50}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTON DE PAGO -->
+          <button
+            id="Ds_Merchant_PayButton"
+            type="button"
+            class="buttonStyle mt-3"
+          >
+            {PAY_BUTTON}
+          </button>
+        </div>
+
+        <!-- Tefpay messages -->
+        <div
+          class="modal fade"
+          id="tefpaymsg"
+          tabindex="-1"
+          role="dialog"
+          data-keyboard="false"
+          data-backdrop="static"
+          aria-labelledby="myModalLabel"
+        >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <div class="row borders">
+                  <div class="col-xs-7 col-lg-1 modelcol">
+                    <i id="tefpaymsg-title-icon" class="fa"></i>
+                  </div>
+                  <div class="col-xs-7 col-lg-10 modelcol">
+                    <p id="tefpaymsg-title-text" class="modal-title h4">
+                      {PAY_TITLE}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-body">
+                <p id="tefpaymsg-text" class="text-left"></p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  id="Ds_Merchant_PayResults"
+                  type="button"
+                  class="btn btn-primary btn-lg"
+                  data-dismiss="modal"
+                >
+                  {MSG24}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Tefpay messages !-->
+      </div>
+    </div>
+    <!-- /container -->
+
+    <!-- jQuery -->
+    <script src="js/00V0000000/jquery.min.js" type="text/javascript"></script>
+
+    <!-- Bootstrap core JavaScript -->
+    <script
+      type="text/javascript"
+      src="js/00V0000000/js/bootstrap.min.js"
+    ></script>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script
+      type="text/javascript"
+      src="js/00V0000000/ie10-viewport-bug-workaround.js"
+    ></script>
+
+    <!-- Tefpay -->
+    <script type="text/javascript">
+      $(document).ready(function () {
+        // Inicializamos los pagos
+        Tefpay.init();
+
+        $("#Ds_Merchant_PayButton").click(function () {
+          // Validamos los datos necessarios para realizar el pago
+          var validation = Tefpay.validate(false);
+
+          switch (validation) {
+            case -1: // Targeta incorrecta
+              $("#PanBox")
+                .addClass("has-error")
+                .find("input")
+                .focus()
+                .parent()
+                .children("p")
+                .removeClass("hidden");
+              alert($("<div/>").html("{VALID_CARD}").text());
+              sendHeight();
+              break;
+            case -2: // CVV Incorrecto
+              $("#CvvBox")
+                .addClass("has-error")
+                .find("input")
+                .focus()
+                .parent()
+                .parent()
+                .find(".hidden")
+                .removeClass("hidden");
+              sendHeight();
+              alert($("<div/>").html("{VALID_CVV}").text());
+              break;
+            case -3: // Caducidad incorrecta
+              $("#ExpiryBox")
+                .addClass("has-error")
+                .find("div select")
+                .first()
+                .focus()
+                .parent()
+                .parent()
+                .find("p.hidden")
+                .removeClass("hidden");
+              sendHeight();
+              alert($("<div/>").html("{VALID_EXP}").text());
+              break;
+            case 1:
+              // Lanzamos el cobro.
+              var data = new Object();
+              data.Ds_Merchant_MerchantCode = "[COMMERCE_NAME]";
+              data.action = "pay";
+
+              Tefpay.execute({
+                data: data,
+                success: function (response) {
+                  $("#tefpaymsg-title-icon")
+                    .attr("class", "fa fa-check fa-2x")
+                    .css("color", "green");
+                  $("#tefpaymsg-title-text").html("{PAY_TITLE}");
+                  $("#tefpaymsg-text")
+                    .attr("class", "text-success")
+                    .html("{PAY_SUCCESS_TEXT}");
+                  $("#Ds_Merchant_PayResults")
+                    .html("{PAY_SUCCESS}")
+                    .prop("disabled", false);
+                },
+                fail: function (response) {
+                  $("#tefpaymsg-title-icon")
+                    .attr("class", "fa fa-times fa-2x")
+                    .css("color", "red");
+                  $("#tefpaymsg-title-text").html("{PAY_TITLE}");
+                  $("#tefpaymsg-text")
+                    .attr("class", "text-danger")
+                    .html(
+                      "{PAY_FAIL_TEXT}" +
+                        " ({PAY_FAIL_CODE}: " +
+                        response.transaction.Ds_Code +
+                        ")"
+                    );
+                  $("#Ds_Merchant_PayResults")
+                    .html("{PAY_FAIL}")
+                    .prop("disabled", false);
+                },
+                error: function (response) {
+                  $("#tefpaymsg-title-icon")
+                    .attr("class", "fa fa-times fa-2x")
+                    .css("color", "red");
+                  $("#tefpaymsg-title-text").html("{PAY_TITLE}");
+                  $("#tefpaymsg-text")
+                    .attr("class", "text-danger")
+                    .html("{PAY_ERROR}");
+                  $("#Ds_Merchant_PayResults")
+                    .html("{PAY_FAIL}")
+                    .prop("disabled", false);
+                },
+              });
+              $("#tefpaymsg").modal("show");
+              break;
+          }
+        });
+
+        $("#Ds_Merchant_PayResults").click(function () {
+          Tefpay.redirect();
+        });
+
+        $("#tefpaymsg").on("show.bs.modal", function (event) {
+          var modal = $(this);
+          var button = $(event.relatedTarget); // Button that triggered the modal
+          var recipient = button.data("whatever"); // Extract info from data-* attributes
+
+          $("#tefpaymsg-title-icon")
+            .attr("class", "fa fa-circle-o-notch fa-spin fa-2x")
+            .css("color", "black");
+          $("#tefpaymsg-title-text").html("{PAY_LOADING}");
+
+          $("#tefpaymsg-text")
+            .attr("class", "text-info")
+            .html("{PAY_LOADING_TEXT}");
+          $("#Ds_Merchant_PayResults")
+            .html("{PAY_LOADING_BTN}")
+            .prop("disabled", true);
+        });
+
+        var d = new Date();
+        var yoptions = "<option disabled selected>{MSG47}<\/option>";
+        for (var x = d.getFullYear(); x != d.getFullYear() + 10; x++) {
+          yoptions += "<option>" + x + "<\/option>";
+        }
+
+        $("#Ds_Merchant_PanYear").html(yoptions);
+
+        $("#Ds_Merchant_PanMask").bind("focus", function () {
+          $("#Ds_Merchant_PanMask").bind("keypress", function () {
+            $("#PanBox")
+              .removeClass("has-error")
+              .find("input")
+              .parent()
+              .children("p")
+              .addClass("hidden");
+            $("#Ds_Merchant_PanMask").unbind("keypress");
+          });
+        });
+
+        $("#Ds_Cvv2").bind("focus", function () {
+          $("#Ds_Cvv2").bind("keypress", function () {
+            $("#CvvBox")
+              .removeClass("has-error")
+              .find(".help-block")
+              .addClass("hidden");
+            $("#Ds_Cvv2").unbind("keypress");
+          });
+        });
+
+        $("#Ds_Merchant_PanMonth").bind("change", function () {
+          if (
+            $.isNumeric($(this).val()) &&
+            $.isNumeric($("#Ds_Merchant_PanYear").val())
+          )
+            $("#ExpiryBox")
+              .removeClass("has-error")
+              .find("p.help-block")
+              .addClass("hidden");
+        });
+        $("#Ds_Merchant_PanYear").bind("change", function () {
+          if (
+            $.isNumeric($(this).val()) &&
+            $.isNumeric($("#Ds_Merchant_PanMonth").val())
+          )
+            $("#ExpiryBox")
+              .removeClass("has-error")
+              .find("p.help-block")
+              .addClass("hidden");
+        });
+
+        // Preparamos eventos
+        var eventMethod = window.addEventListener
+          ? "addEventListener"
+          : "attachEvent";
+        var eventer = window[eventMethod];
+        var messageEvent =
+          eventMethod == "attachEvent" ? "onmessage" : "message";
+        eventer(
+          messageEvent,
+          function (e) {
+            if (isNaN(e.data)) return;
+            sendHeight();
+          },
+          false
+        );
+        // Refresco una vez cargada la pagina.
+        sendHeight();
+      });
+    </script>
+
+    <script type="text/javascript">
+      function sendHeight() {
+        if (parent.postMessage) {
+          var height = document.getElementById("wrapper").offsetHeight;
+          parent.postMessage(height, "*");
+        }
+      }
+    </script>
+  </body>
+</html>

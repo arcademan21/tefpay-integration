@@ -30,7 +30,6 @@ Integración universal, robusta y minimalista de pagos y suscripciones TEFPAY pa
     - [¿Por qué no hay un test de `Next.js` "estándar"?](#por-qué-no-hay-un-test-de-nextjs-estándar)
   - [Solución de Problemas Comunes](#solución-de-problemas-comunes)
   - [Diagrama de Flujo de Integración](#diagrama-de-flujo-de-integración)
-  - [Documentación Avanzada](#documentación-avanzada)
   - [Soporte](#soporte)
 
 ---
@@ -428,17 +427,64 @@ flowchart TD
 
 ---
 
-## Documentación Avanzada
-
-Para casos de uso complejos, configuraciones detalladas, variantes específicas y preguntas adicionales, consulta la documentación extendida:
-
-- [Documentación Técnica Avanzada](https://www.google.com/search?q=./docs/technical-documentation/README.md)
-- [Ejemplos de Uso Específicos](https://www.google.com/search?q=./docs/README.examples.md)
-
----
-
 ## Soporte
 
 Si tienes dudas sobre la configuración de tu cuenta Tefpay, el proceso de activación de notificaciones o el flujo transaccional específico de Tefpay, por favor, revisa su documentación oficial y contacta directamente al equipo de soporte de Tefpay.
 
 Para consultas relacionadas con la implementación de `tefpay-integration` en tu código, problemas con los adaptadores, o sugerencias de mejora del paquete, abre un _issue_ en nuestro repositorio de GitHub.
+
+---
+
+# Editor visual inteligente para templates Tefpay
+
+## Descripción
+
+Sistema visual avanzado para editar, personalizar y exportar templates de formularios de pago Tefpay. Permite edición visual, gestión de assets, internacionalización, optimización automática y exportación lista para integración.
+
+## Instalación y activación
+
+El editor está disponible solo en modo desarrollo. Se activa mediante el botón flotante en la interfaz.
+
+## Funcionalidades principales
+
+- Edición visual de layouts, estilos, textos y lógica JS.
+- Vista previa en tiempo real y simulación de interacciones.
+- Gestión de assets: logo, fondo, iconos, favicon (drag & drop, renombrar, eliminar).
+- Internacionalización automática (i18next), validación de traducciones y placeholders.
+- Optimización automática de imágenes (compresión/minificación).
+- Exportación avanzada: ZIP con HTML, traducciones y assets en varios formatos (PNG, JPG, SVG, ICO).
+- Extensible mediante plugins (campos, integraciones, validaciones extra).
+
+## Uso básico
+
+1. Haz clic en el botón flotante para abrir el editor visual.
+2. Navega por las pestañas: Layout, Estilos, Textos, Lógica, Vista Previa, Exportar.
+3. Edita el formulario, estilos, textos y lógica según tus necesidades.
+4. Arrastra y gestiona assets (logo, fondo, iconos, favicon).
+5. Valida traducciones y lógica antes de exportar.
+6. Exporta el ZIP listo para integración Tefpay.
+
+## Exportación y formatos soportados
+
+- El ZIP incluye:
+  - template.html
+  - translations.json
+  - logo, fondo, iconos y favicon en formatos originales y alternativos (PNG, JPG, SVG, ICO).
+- Las imágenes se comprimen y minifican automáticamente.
+- Soporte para internacionalización y validación de assets.
+
+## Extensibilidad y roadmap
+
+- El sistema permite añadir plugins para nuevos campos, integraciones o validaciones.
+- Próximas mejoras: historial de versiones, previsualización multi-dispositivo, sugerencias inteligentes de UX/accesibilidad.
+
+## Preguntas frecuentes
+
+- ¿El editor está disponible en producción? No, solo en desarrollo.
+- ¿Puedo añadir mis propios plugins? Sí, la arquitectura es extensible.
+- ¿Qué pasa si falta una traducción? El editor bloquea la exportación y muestra advertencias.
+
+## Documentación técnica y ejemplos
+
+- Consulta `docs/PROPUESTA_EDITOR_TEMPLATE.md` para la propuesta completa y detalles de arquitectura.
+- Ejemplos visuales y casos de uso en `docs/README.examples.md`.
