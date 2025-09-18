@@ -6,4 +6,4 @@ export * from "./tefpay-utils";
 export * from "./tefpay-errors";
 
 // Editor visual de templates Tefpay (solo desarrollo)
-export * from "./editor/TefpayTemplateEditor";
+export { default as TefpayTemplateEditor } from "./editor/TefpayTemplateEditor";
