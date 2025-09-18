@@ -26,7 +26,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist --sourcemap",
+    "build": "tsup",
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run clean && pnpm run build",
     "test": "jest"
@@ -60,6 +60,7 @@
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "@types/sha1": "^1.1.5",
+    "browser-image-compression": "^2.0.2",
     "file-saver": "^2.0.5",
     "i18next": "^25.5.2",
     "jszip": "^3.10.1",
