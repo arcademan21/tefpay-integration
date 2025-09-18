@@ -1885,4 +1885,5 @@ const TefpayTemplateEditorModal: React.FC<Props> = ({ onClose }) => {
   );
 };
 
-export default TefpayTemplateEditorModal;
+const TefpayTemplateEditor: React.FC<Props> = TefpayTemplateEditorModal;
+export default TefpayTemplateEditor;
